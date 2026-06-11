@@ -28,7 +28,15 @@ def is_mod():
 @commands.dm_only() 
 @is_mod()
 async def cmds(ctx):
-    await ctx.send("The commands available to you: !assign_roles")
+    await ctx.send("""The commands available to you: 
+                   !create_roles [num players]
+                   !add_role [role name] [num]
+                   !remove_role [role name] [num]
+                   !assign_roles
+                   !get_player_roles
+                   !send_roles
+                   !end_game
+                   """)
 
 
 @bot.command()
@@ -66,18 +74,35 @@ async def get_player_roles(ctx):
       await ctx.send(game.list_player_roles(ctx.author))
 
 
+@bot.command()
+@commands.dm_only()
+@is_mod()
+async def send_roles(ctx):
+      players = game.get_player_assignment()
+      for player, role in players.items():
+            await player.send(f"Your role is: {role}")
+
+
+@bot.command()
+@commands.dm_only()
+@is_mod()
+async def end_game(ctx):
+      await ctx.send(game.end_game())
+
+
 # ==========================================
 #  SERVER CHANNEL COMMANDS (Anyone Can Use)
 # ==========================================
 
 @bot.tree.command(name="register", description="Register for Werewolf game")
 async def register(interaction: discord.Interaction):
+    print(f"{interaction.user.name} has registered.")
     await interaction.response.send_message(game.register(interaction.user), ephemeral=True)
 
 
 @bot.tree.command(name="players", description="Lists current players for the game")
 async def players(interaction: discord.Interaction):
-      players_message = game.getPlayers()
+      players_message = game.get_players()
       await interaction.response.send_message(players_message, ephemeral=True)
 
 

@@ -16,6 +16,11 @@ class WerewolfGame:
     def __init__(self):
         None
 
+    
+    def get_player_assignment(self):
+        return self.player_assignment
+
+
     def populate_roles(self, num_players):
         n = num_players
         self.roles["seer"] = 1
@@ -71,9 +76,9 @@ class WerewolfGame:
             return "Game has started, you cannot remove a role now."
     
 
-    def register(self, player_name):
+    def register(self, player):
         if not self.has_game_started:
-            self.players.add(player_name)
+            self.players.add(player)
             return "You have successfully registered!"
         else:
             return "Game has started, please wait until it ends to join in."
