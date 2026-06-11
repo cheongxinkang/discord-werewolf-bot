@@ -1,6 +1,6 @@
 import os
 import discord
-import werewolf
+import werewolf_game_engine
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ intents = discord.Intents.default()
 intents.message_content = True 
 
 bot = commands.Bot(command_prefix="!", intents=intents)
-game = werewolf.WerewolfGame()
+game = werewolf_game_engine.WerewolfGame()
 
 def is_mod():
       async def predicate(ctx):
