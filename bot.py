@@ -44,6 +44,28 @@ async def assign_roles(ctx):
 async def create_roles(ctx, num: int):
       await ctx.send(game.populate_roles(num))
 
+
+@bot.command()
+@commands.dm_only()
+@is_mod()
+async def add_role(ctx, name:str, num: int):
+      await ctx.send(game.add_role(name, num))
+
+
+@bot.command()
+@commands.dm_only()
+@is_mod()
+async def remove_role(ctx, name:str, num: int):
+      await ctx.send(game.remove_role(name, num))
+
+
+@bot.command()
+@commands.dm_only()
+@is_mod()
+async def get_player_roles(ctx):
+      await ctx.send(game.list_player_roles(ctx.author))
+
+
 # ==========================================
 #  SERVER CHANNEL COMMANDS (Anyone Can Use)
 # ==========================================
@@ -63,6 +85,11 @@ async def players(interaction: discord.Interaction):
 async def claim_mod(interaction: discord.Interaction):
       await interaction.response.send_message(game.register_mod(interaction.user))
       await interaction.user.send("You're the moderator of the werewolf game. DM me privately for mod commands. Use !cmds for list of commands.")
+
+
+@bot.tree.command(name="unclaim_mod", description="Remove the moderator of this werewolf game")
+async def unclaim_mod(interaction: discord.Interaction):
+      await interaction.response.send_message(game.unclaim_mod(interaction.user))
 
 
 @bot.tree.command(name="get_roles", description="Get the list of roles in the game.")
