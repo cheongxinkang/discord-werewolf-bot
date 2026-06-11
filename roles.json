@@ -1,0 +1,17 @@
+{
+  "villager": {
+    "name": "Villager",
+    "team": "Town",
+    "description": "A standard townsperson with no special powers. Your main weapon is your voice and your vote during the daytime phase."
+  },
+  "werewolf": {
+    "name": "Werewolf",
+    "team": "Werewolves",
+    "description": "An apex predator. You wake up every night with your pack to choose a villager to eliminate. Blend in during the day!"
+  },
+  "seer": {
+    "name": "Seer",
+    "team": "Town",
+    "description": "A powerful mystic. Once per night, you can inspect one player to reveal whether they are a Villager or a Werewolf."
+  }
+}

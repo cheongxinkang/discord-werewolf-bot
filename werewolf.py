@@ -1,3 +1,4 @@
+import json
 import random
 
 """
@@ -6,15 +7,20 @@ A game of werewolf where there are a set number of roles and you can define more
 The game then proceeds to play with players sending in their votes for their roles and/or village lynching
 """
 class WerewolfGame:
-    roles = dict()
-    available_roles = ["werewolf","villager","seer","doctor","hunter"]
+    available_roles = ["werewolf","villager","seer","doctor","hunter","tracker",
+                       "tanner","spellcaster","guard","tough villager","witch",
+                       "vigilante","sneaky werewolf", "werewolf cub","town crier",
+                       "lovers","chupacabra","graverobber"]
     players = set()
     mod = None
     has_game_started = False
     player_assignment = dict()
 
     def __init__(self):
-        None
+        with open("roles.json", "r") as file:
+            self.ROLE_DATA = json.load(file)
+        self.roles = dict()
+        
 
     
     def get_player_assignment(self):
@@ -180,9 +186,46 @@ class WerewolfGame:
         return list
 
 
-    def run(self):
-        # this has the logic for running the whole game
-        # it ends when the game has ended
-        # it will have to wait for responses which makes this really difficult
-        # actually
-        return 0
+async def run_game(guild):
+    """The core engine loop that automates transitions using non-blocking sleep intervals."""
+    town_channel = guild.get_channel(game.town_channel_id)
+    
+    while game.is_active:
+        # ==========================================
+        # 1. NIGHT PHASE (60 Seconds)
+        # ==========================================
+        await transition_to_night(guild)
+        await town_channel.send("⏱️ *The night will last 60 seconds. Werewolves, choose your prey.*")
+        
+        # Non-blocking pause: allows the bot to listen to !kill commands inside the den
+        await asyncio.sleep(60) 
+        
+        # ==========================================
+        # 2. MORNING TRANSITION
+        # ==========================================
+        await transition_to_day(guild)
+        
+        # If a win condition was hit during morning calculations, break out immediately
+        if not game.is_active:
+            break
+            
+        # ==========================================
+        # 3. DAY DISCUSSION & VOTING PHASE (120 Seconds)
+        # ==========================================
+        await town_channel.send("⏱️ *You have 2 minutes to discuss, accuse, and vote using `!vote @player`.*")
+        
+        # Wait for either the timer to expire OR a sudden majority vote to trigger early
+        # We check the state every 5 seconds to see if an early execution stopped the phase
+        timer = 120
+        while timer > 0 and game.phase == "Voting":
+            await asyncio.sleep(5)
+            timer -= 5
+            
+        # If the timer ran out and no majority was hit, process a "No Execution" or highest vote
+        if game.phase == "Voting" and game.is_active:
+            await town_channel.send("⌛ **Time's up!** The sun sets and the town failed to reach a conclusive verdict.")
+            # Clear votes and cycle back to night
+            game.phase = "Night"
+            
+        # Small buffer window before the next night starts
+        await asyncio.sleep(3)
