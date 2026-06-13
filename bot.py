@@ -87,8 +87,14 @@ async def send_roles(ctx):
 @commands.dm_only()
 @is_mod()
 async def end_game(ctx):
-      await ctx.send(game.end_game())
+      await ctx.send(game.end_game(ctx.author))
 
+# Remove players
+# @bot.command()
+# @commands.dm_only()
+# @is_mod()
+# async def remove_player(ctx, num: int):
+#       await ctx.send(game.remove_player())
 
 # ==========================================
 #  SERVER CHANNEL COMMANDS (Anyone Can Use)
@@ -96,8 +102,14 @@ async def end_game(ctx):
 
 @bot.tree.command(name="register", description="Register for Werewolf game")
 async def register(interaction: discord.Interaction):
-    print(f"{interaction.user.name} has registered.")
     await interaction.response.send_message(game.register(interaction.user), ephemeral=True)
+#     await interaction.channel.send(f"{interaction.user.global_name} has registered. See player list at /players")
+
+# Unregister
+@bot.tree.command(name="unregister", description="Removes your registration for Werewolf game")
+async def unregister(interaction: discord.Interaction):
+      await interaction.response.send_message(game.unregister(interaction.user), ephemeral=True)
+      # await interaction.channel.send(f"{interaction.user.global_name} has left the game.")
 
 
 @bot.tree.command(name="players", description="Lists current players for the game")

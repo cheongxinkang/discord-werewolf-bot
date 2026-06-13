@@ -85,15 +85,26 @@ class WerewolfGame:
     def register(self, player):
         if not self.has_game_started:
             self.players.add(player)
+            print(f"{player.global_name} has registered.")
             return "You have successfully registered!"
         else:
             return "Game has started, please wait until it ends to join in."
+        
+    
+    def unregister(self, player):
+        if not self.has_game_started:
+            print(self.players)
+            self.players.discard(player)
+            print(f"{player.global_name} has unregistered.")
+            return "You have successfully unregistered!"
+        else:
+            return "Game has started, please wait until it ends to leave."
 
 
     def get_players(self):
         return_string = "The current list of players are: "
         for player in self.players:
-            return_string += f"{player.name}, "
+            return_string += f"{player.global_name}, "
 
         return return_string[:len(return_string)-2]
 
@@ -186,46 +197,46 @@ class WerewolfGame:
         return list
 
 
-async def run_game(guild):
-    """The core engine loop that automates transitions using non-blocking sleep intervals."""
-    town_channel = guild.get_channel(game.town_channel_id)
+# async def run_game(guild):
+#     """The core engine loop that automates transitions using non-blocking sleep intervals."""
+#     town_channel = guild.get_channel(game.town_channel_id)
     
-    while game.is_active:
-        # ==========================================
-        # 1. NIGHT PHASE (60 Seconds)
-        # ==========================================
-        await transition_to_night(guild)
-        await town_channel.send("⏱️ *The night will last 60 seconds. Werewolves, choose your prey.*")
+#     while game.is_active:
+#         # ==========================================
+#         # 1. NIGHT PHASE (60 Seconds)
+#         # ==========================================
+#         await transition_to_night(guild)
+#         await town_channel.send("⏱️ *The night will last 60 seconds. Werewolves, choose your prey.*")
         
-        # Non-blocking pause: allows the bot to listen to !kill commands inside the den
-        await asyncio.sleep(60) 
+#         # Non-blocking pause: allows the bot to listen to !kill commands inside the den
+#         await asyncio.sleep(60) 
         
-        # ==========================================
-        # 2. MORNING TRANSITION
-        # ==========================================
-        await transition_to_day(guild)
+#         # ==========================================
+#         # 2. MORNING TRANSITION
+#         # ==========================================
+#         await transition_to_day(guild)
         
-        # If a win condition was hit during morning calculations, break out immediately
-        if not game.is_active:
-            break
+#         # If a win condition was hit during morning calculations, break out immediately
+#         if not game.is_active:
+#             break
             
-        # ==========================================
-        # 3. DAY DISCUSSION & VOTING PHASE (120 Seconds)
-        # ==========================================
-        await town_channel.send("⏱️ *You have 2 minutes to discuss, accuse, and vote using `!vote @player`.*")
+#         # ==========================================
+#         # 3. DAY DISCUSSION & VOTING PHASE (120 Seconds)
+#         # ==========================================
+#         await town_channel.send("⏱️ *You have 2 minutes to discuss, accuse, and vote using `!vote @player`.*")
         
-        # Wait for either the timer to expire OR a sudden majority vote to trigger early
-        # We check the state every 5 seconds to see if an early execution stopped the phase
-        timer = 120
-        while timer > 0 and game.phase == "Voting":
-            await asyncio.sleep(5)
-            timer -= 5
+#         # Wait for either the timer to expire OR a sudden majority vote to trigger early
+#         # We check the state every 5 seconds to see if an early execution stopped the phase
+#         timer = 120
+#         while timer > 0 and game.phase == "Voting":
+#             await asyncio.sleep(5)
+#             timer -= 5
             
-        # If the timer ran out and no majority was hit, process a "No Execution" or highest vote
-        if game.phase == "Voting" and game.is_active:
-            await town_channel.send("⌛ **Time's up!** The sun sets and the town failed to reach a conclusive verdict.")
-            # Clear votes and cycle back to night
-            game.phase = "Night"
+#         # If the timer ran out and no majority was hit, process a "No Execution" or highest vote
+#         if game.phase == "Voting" and game.is_active:
+#             await town_channel.send("⌛ **Time's up!** The sun sets and the town failed to reach a conclusive verdict.")
+#             # Clear votes and cycle back to night
+#             game.phase = "Night"
             
-        # Small buffer window before the next night starts
-        await asyncio.sleep(3)
+#         # Small buffer window before the next night starts
+#         await asyncio.sleep(3)
